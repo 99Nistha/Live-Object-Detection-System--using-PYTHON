@@ -1,0 +1,164 @@
+import cv2
+import numpy as np
+
+
+# Load Yolo
+net = cv2.dnn.readNet("C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\yolov3.weights", "C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\yolov3.cfg")
+classes = []
+with open("C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\coco.names", "r") as f:
+    classes = [line.strip() for line in f.readlines()]
+layer_names = net.getLayerNames()
+output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+colors = np.random.uniform(0, 255, size=(len(classes), 3))
+# Loading image
+#import matplotlib.pyplot as plt
+img = cv2.imread("C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\room_ser.jpg")
+img = cv2.resize(img, None, fx=0.2, fy=0.2)
+height, width, channels = img.shape
+cv2.imshow("Image",img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+# Loading image
+#import matplotlib.pyplot as plt
+img = cv2.imread("C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\room_ser.jpg")
+img = cv2.resize(img, None, fx=0.2, fy=0.2)
+height, width, channels = img.shape
+cv2.imshow("Image",img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import matplotlib.pyplot as plt
+
+font=cv2.FONT_HERSHEY_PLAIN
+
+video=cv2.VideoCapture(0)
+count=0
+while True:
+        count+=1
+        ret,frame=video.read()
+       
+        frame=cv2.resize(frame,None, fx=2,fy=2)
+        count+=1
+        path='C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\cnn1\\img.png'
+        #frame_RGB=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+        if count%50==0:
+            
+        
+            cv2.imwrite(path,frame)
+            #will save in current folder
+            frame=test(path)
+            cv2.imshow('live video',frame)
+        #boxes,confidences,class_ids=test(path)
+
+        elif cv2.waitKey(20)&0xFF==27:
+             break
+
+        
+video.release()
+cv2.destroyAllWindows()
+import cv2
+import matplotlib.pyplot as plt
+
+font=cv2.FONT_HERSHEY_PLAIN
+
+video=cv2.VideoCapture(0)
+count=0
+while True:
+        count+=1
+        ret,frame=video.read()
+       
+        frame=cv2.resize(frame,None, fx=2,fy=2)
+        count+=1
+        path='C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\cnn1\\img.jpg'
+        #frame_RGB=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+        if count%50==0:
+            
+        
+            cv2.imwrite(path,frame)
+            #will save in current folder
+            frame=test(path)
+            cv2.imshow('live video',frame)
+        #boxes,confidences,class_ids=test(path)
+
+        elif cv2.waitKey(20)&0xFF==27:
+             break
+
+        
+video.release()
+cv2.destroyAllWindows()
+
+def test1(frame):
+    #frame= cv2.imread(frame)
+    blob = cv2.dnn.blobFromImage(frame, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+    height, width, channels = frame.shape
+    net.setInput(blob)
+    outs = net.forward(output_layers)
+    
+
+# Showing informations on the screen
+    class_ids = []
+    confidences = []
+    boxes = []
+    for out in outs:
+        for detection in out:
+            scores = detection[5:]
+            class_id = np.argmax(scores)
+            confidence = scores[class_id]
+            if confidence > 0.5:
+            # Object detected
+                center_x = int(detection[0] * width)
+                center_y = int(detection[1] * height)
+                w = int(detection[2] * width)
+                h = int(detection[3] * height)
+
+            # Rectangle coordinates
+                x = int(center_x - w / 2)
+                y = int(center_y - h / 2)
+
+                boxes.append([x, y, w, h])
+                confidences.append(float(confidence))
+                class_ids.append(class_id)
+                indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+                # print(indexes)
+        
+    for i in range(len(boxes)):
+            if i in indexes:
+                x, y, w, h = boxes[i]
+                label = str(classes[class_ids[i]])
+                color = colors[i]
+                cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+                cv2.putText(frame, label, (x, y + 30), font, 3, color, 3)
+
+   
+    return frame
+import cv2
+import matplotlib.pyplot as plt
+
+font=cv2.FONT_HERSHEY_PLAIN
+
+video=cv2.VideoCapture(0)
+count=0
+while True:
+        count+=1
+        ret,frame=video.read()
+       
+        frame=cv2.resize(frame,None, fx=2,fy=2)
+        count+=1
+        path='C:\\Users\\Nistha\\Desktop\\goedu\\python\\project\\object\\cnn1\\img'+str(count)+'.png'
+        #frame_RGB=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+        if count%50==0:
+            
+            frame=test1(frame)
+            cv2.imwrite(path,frame)
+            #will save in current folder
+            cv2.imread(path)
+            cv2.imshow('live video',frame)
+        #boxes,confidences,class_ids=test(path)
+
+        elif cv2.waitKey(20)&0xFF==27:
+             break
+
+        
+video.release()
+cv2.destroyAllWindows()
+
